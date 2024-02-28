@@ -3,18 +3,18 @@ version: '3'
 services:
   database:
     image: postgres:latest
+    ports:
+      - "5432:5432"
     volumes:
       - db-data:/var/lib/postgresql/data
     environment:
-      POSTGRES_DB: php
+      POSTGRES_DB: app
       POSTGRES_PASSWORD: postgres
       POSTGRES_USER: postgres
 
   php:
     build:
       context: ./php
-    ports:
-      - '9000:9000'
     volumes:
       - ./app:/var/www/symfony_docker
     depends_on:

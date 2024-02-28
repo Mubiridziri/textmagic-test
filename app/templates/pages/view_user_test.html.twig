@@ -1,0 +1,31 @@
+{% extends "base.html.twig" %}
+
+{% block body %}
+    <style>
+        .container {
+            max-width: 960px;
+        }
+
+    </style>
+    <div class="container">
+        {% for key, answer in userTest.answers %}
+            <h4 style="color:{% if not answer.isCorrect %} red {% else%} green {% endif %}">Вопрос №{{ key+1 }}</h4>
+            <h5 class="mb-3"> {{ answer.question.Title }}</h5>
+            <input hidden name="form[{{ key }}][id]" class="form-check-input" type="text"
+                   value="{{ answer.question.id }}" id="form[{{ key }}][id]">
+            {% for index, option in answer.answerOptions %}
+                <div class="form-check">
+                    <input name="form[{{ key }}][answers][]" class="form-check-input" type="checkbox"
+                           checked
+                           value="{{ option.id }}"
+                           id="form[{{ key }}][answers][]" disabled>
+                    <label class="form-check-label" for="form[{{ key }}][answers][]">
+                        {{ option.label }}
+                    </label>
+                </div>
+            {% endfor %}
+            {% if not answer.isCorrect %}<p> Верными ответами является: {% for option in answer.getCorrectAnswers %}<span class="badge" style="background-color: green;">{{ option.label }}</span> {% endfor %}</p>{% endif %}
+            <hr/>
+        {% endfor %}
+    </div>
+{% endblock %}

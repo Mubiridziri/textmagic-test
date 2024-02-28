@@ -1,0 +1,88 @@
+{% extends "base.html.twig" %}
+
+{% block body %}
+    <style>
+        .container {
+            max-width: 960px;
+        }
+
+    </style>
+    <div class="container">
+        <main>
+            <div class="py-5 text-center">
+                <img class="d-block mx-auto mb-4" src="logo.png" alt=""
+                     width="150" height="150">
+                <h2>{% if userTest is defined %}Результаты{% else %}Тестирование по высшей математике{% endif %}</h2>
+                <p class="lead">{% if userTest is defined %}Давайте-ка, посмотрим, что Вы тут нарешали..{% else %}Как хорошо вы запомнили математику в школе? Давайте проверим!{% endif %}</p>
+
+            </div>
+            <div class="col">
+
+
+                {% if userTest is defined %}
+                    <div class="alert alert-success" role="alert">
+                        Спасибо за прохождения теста! Ниже вы можете посмотреть на какие вопросы ответы были верными, а
+                        на какие, увы, нет.
+                    </div>
+                {% endif %}
+
+                {% if userTest is defined %}
+                    {% for key, answer in userTest.answers %}
+                        <h4 style="color:{% if not answer.isCorrect %} red {% else%} green {% endif %}">Вопрос №{{ key+1 }}</h4>
+                        <h5 class="mb-3"> {{ answer.question.Title }}</h5>
+                        <input hidden name="form[{{ key }}][id]" class="form-check-input" type="text"
+                               value="{{ answer.question.id }}" id="form[{{ key }}][id]">
+                        {% for index, option in answer.answerOptions %}
+                            <div class="form-check">
+                                <input name="form[{{ key }}][answers][]" class="form-check-input" type="checkbox"
+                                       checked
+                                       value="{{ option.id }}"
+                                       id="form[{{ key }}][answers][]" disabled>
+                                <label class="form-check-label" for="form[{{ key }}][answers][]">
+                                    {{ option.label }}
+                                </label>
+                            </div>
+                        {% endfor %}
+                        {% if not answer.isCorrect %}<p> Верными ответами является: {% for option in answer.getCorrectAnswers %}<span class="badge" style="background-color: green;">{{ option.label }}</span> {% endfor %}</p>{% endif %}
+                        <hr/>
+                    {% endfor %}
+                    <a class="w-100 btn btn-primary btn-lg" href="/" role="button">Пройти еще раз</a>
+                {% else %}
+                    {% if error is defined %}
+                        <div class="alert alert-danger" role="alert">
+                            {{ error }}
+                        </div>
+                    {% endif %}
+                    <form method="post" action="">
+                        {% for key, question in questions %}
+                            <h4>Вопрос №{{ key+1 }}</h4>
+                            <h5 class="mb-3"> {{ question.Title }}</h5>
+                            <input hidden name="form[{{ key }}][id]" class="form-check-input" type="text"
+                                   value="{{ question.id }}" id="form[{{ key }}][id]">
+                            {% for index, option in question.options %}
+                                <div class="form-check">
+                                    <input name="form[{{ key }}][answers][]" class="form-check-input" type="checkbox"
+                                           {% if formValues[key]['answers'][index] is defined %}checked{% endif %}
+                                           value="{{ option.id }}"
+                                           id="form[{{ key }}][answers][]" {% if userTest is defined %}disabled{% endif %}>
+                                    <label class="form-check-label" for="form[{{ key }}][answers][]">
+                                        {{ option.label }}
+                                    </label>
+                                </div>
+                            {% endfor %}
+                            <hr/>
+                        {% endfor %}
+                        <button class="w-100 btn btn-primary btn-lg" type="submit"
+                                {% if userTest is defined %}disabled{% endif %}>Отправить
+                        </button>
+                        {% if error is defined %}
+                            <div class="alert alert-danger" role="alert">
+                                {{ error }}
+                            </div>
+                        {% endif %}
+                    </form>
+                {% endif %}
+            </div>
+        </main>
+    </div>
+{% endblock %}
